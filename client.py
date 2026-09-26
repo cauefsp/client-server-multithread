@@ -1,9 +1,11 @@
 import json
 import shlex
 import sys
+import time
 from socket import *
 
 from constCS import *
+from gerador import gerar_requisicoes
 from protocol import send_json, recv_json
 
 DEMO_OPERATIONS = [
@@ -53,7 +55,44 @@ def request_operations(conn, operations):
         print("  ERRO: " + response["error"])
 
 
+def send_request(request):
+    conn = socket(AF_INET, SOCK_STREAM)
+    try:
+        conn.connect((HOST, PORT))
+        send_json(conn, request)
+        return recv_json(conn)
+    except OSError as failure:
+        return {"results": [], "error": "falha de conexao: " + str(failure)}
+    finally:
+        conn.close()
+
+
+def enviar_em_sequencia(requisicoes):
+    return [send_request(request) for request in requisicoes]
+
+
+def contar_falhas(respostas):
+    return sum(1 for response in respostas if response is None or "error" in response)
+
+
+def mostrar_resumo(respostas, tempo_total):
+    print("{} requisicoes em {:.3f} s ({:.0f} req/s), {} falhas".format(
+        len(respostas), tempo_total, len(respostas) / tempo_total, contar_falhas(respostas)))
+
+
+def rodar_automatico(enviar, argumentos):
+    quantidade = int(argumentos[0]) if len(argumentos) > 0 else 1000
+    espera_ms = int(argumentos[1]) if len(argumentos) > 1 else 0
+    requisicoes = gerar_requisicoes(quantidade, espera_ms)
+    inicio = time.perf_counter()
+    respostas = enviar(requisicoes)
+    mostrar_resumo(respostas, time.perf_counter() - inicio)
+
+
 def main():
+    if "-a" in sys.argv:
+        rodar_automatico(enviar_em_sequencia, sys.argv[sys.argv.index("-a") + 1:])
+        return
     conn = socket(AF_INET, SOCK_STREAM)
     conn.connect((HOST, PORT))
     if "-i" in sys.argv:
