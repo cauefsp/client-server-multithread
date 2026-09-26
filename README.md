@@ -108,8 +108,8 @@ requisição espera, outras avançam, e o tempo caiu de 12,7 s para 2,3 s.
 Numa segunda execução completa os números ficaram parecidos; o que mais variou foi a
 versão com threads nos dois lados no cenário 2 (1,9 s, ganho de 6,8x). Como cada
 requisição abre e fecha uma conexão, o sistema acumula milhares de sockets em
-`TIME_WAIT`, então também medi cada versão sozinha, esperando esses sockets sumirem
-antes. A ordem entre as versões não mudou.
+`TIME_WAIT`, então também medi cada versão do cenário 1 sozinha, esperando esses
+sockets sumirem antes. A ordem entre as versões não mudou.
 
 ## Arquivos
 
