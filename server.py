@@ -1,3 +1,4 @@
+import time
 from socket import *
 
 from constCS import *
@@ -30,6 +31,11 @@ def word_count(text):
     return len(text.split())
 
 
+def sleep(ms):
+    time.sleep(ms / 1000)
+    return ms
+
+
 OPERATIONS = {
     "add": add,
     "subtract": subtract,
@@ -37,6 +43,7 @@ OPERATIONS = {
     "divide": divide,
     "reverse": reverse,
     "word_count": word_count,
+    "sleep": sleep,
 }
 
 
